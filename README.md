@@ -24,40 +24,36 @@ This project leverages this by:
 
 ---
 
+Of course. Here is the corrected mathematical formulation for your markdown file.
+
 ## Mathematical Framework
 
 ### 1. The Standard Non-Convex Problem
 
-The standard objective for a two-layer ReLU network can be formulated as follows, where \( W_1 \) and \( W_2 \) are the weights of the two layers:
+The standard objective for a two-layer ReLU network can be formulated as follows, where $W_1$ and $W_2$ are the weights of the two layers:
 
 $$
-\min_{W_1, W_2} \frac{1}{2} \left\| \sum_{j=1}^{H} \max(0, x^T w_{1j}) w_{2j} - y \right\|^2 
-+ \frac{\beta}{2} \|W_1\|_F^2 + \frac{\beta}{2} \sum_{j=1}^{H} \|w_{2j}\|_1^2
+\min_{W_1, W_2} \frac{1}{2} \left\| \sum_{j=1}^{H} \max(0, x^T w_{1j}) w_{2j} - y \right\|^2 + \frac{\beta}{2} \|W_1\|_F^2 + \frac{\beta}{2} \sum_{j=1}^{H} \|w_{2j}\|_1^2
 $$
 
-This is implemented in `loss_func_primal`.  
-This function is **non-convex** due to the ReLU activation and the multiplication of weights \( W_1 \) and \( W_2 \).
+This is implemented in `loss_func_primal`. This function is **non-convex** due to the ReLU activation and the multiplication of weights $W_1$ and $W_2$.
 
----
+***
 
 ### 2. The Convex Relaxation
 
-We can reformulate the problem into a convex one by introducing new variables and constraints.  
-The core idea is to replace the non-convex ReLU activation with a set of linear constraints based on pre-generated **sign patterns**.
+We can reformulate the problem into a convex one by introducing new variables and constraints. The core idea is to replace the non-convex ReLU activation with a set of linear constraints based on pre-generated **sign patterns**.
 
-Let \( D \in \{0, 1\}^{N \times P} \) be a matrix of \( P \) sign patterns for \( N \) data points.  
-The prediction \( \hat{y} \) is then modeled as:
+Let $D \in \{0, 1\}^{N \times P}$ be a matrix of $P$ sign patterns for $N$ data points. The prediction $\hat{y}$ is then modeled as:
 
 $$
 \hat{y} = \sum_{p=1}^{P} D_p \odot (X(v_p - w_p))
 $$
 
-The objective function becomes a **convex problem** over the new weight variables \( v \) and \( w \):
+The objective function becomes a **convex problem** over the new weight variables $v$ and $w$:
 
 $$
-\min_{v, w} \frac{1}{2} \|\hat{y} - y\|^2 
-+ \beta \sum_{p,c} (\|v_{pc}\|_1 + \|w_{pc}\|_1) 
-+ \text{Constraint Penalties}
+\min_{v, w} \frac{1}{2} \|\hat{y} - y\|^2 + \beta \sum_{p,c} (\|v_{pc}\|_1 + \|w_{pc}\|_1) + \text{Constraint Penalties}
 $$
 
 This is implemented in `loss_func_cvxproblem`, which includes terms for the prediction error, regularization, and penalties to enforce the ReLU constraints.
